@@ -38,7 +38,7 @@ class My_GMM:
             self.means = []
             for i in range(self.K):
                 mean = np.random.rand(col)
-                # mean = mean / np.sum(mean)        # 归一化
+                mean = mean / np.sum(mean)        # 归一化
                 self.means.append(mean)
 
         if cov_matrixs is not None:
@@ -48,12 +48,12 @@ class My_GMM:
             self.covars = []
             for i in range(self.K):
                 cov = np.random.rand(col, col)
-                # cov = cov / np.sum(cov)                    # 归一化
+                cov = cov / np.sum(cov)                    # 归一化
                 self.covars.append(cov)  # cov是np.array,但是self.covars是list
 
     def clamp(self, x):
         x = np.clip(x, a_max=1e3, a_min=-1e3)
-        #x[np.abs(x) < 1e-4] = np.sign(x[np.abs(x) < 1e-4]) * 1e-4
+        # x[np.abs(x) < 1e-4] = np.sign(x[np.abs(x) < 1e-4]) * 1e-4
         return x
 
     def Gaussian(self, x, mean, cov):
@@ -66,13 +66,13 @@ class My_GMM:
         """
 
         dim = np.shape(cov)[0]
-        # cov的行列式为零时的措施
 
         if np.isnan(np.sum(cov)):
+            print("cov is nan!!!!!!!!!!!!")
             cov = np.eye(dim) * 0.01
 
-#        covdet = np.linalg.det(cov + np.eye(dim) * 0.01)
-#        covinv = np.linalg.inv(cov + np.eye(dim) * 0.01)
+        #        covdet = np.linalg.det(cov + np.eye(dim) * 0.01)
+        #        covinv = np.linalg.inv(cov + np.eye(dim) * 0.01)
         covdet = np.linalg.det(cov)
         covinv = np.linalg.inv(cov)
         xdiff = (x - mean).reshape((1, dim))
@@ -87,8 +87,8 @@ class My_GMM:
         b = np.exp(-0.5 * b)[0][0]
         prob = 1.0 / (a)
         prob = prob * b
-#        prob = 1.0 / (np.power(np.power(2 * np.pi, dim) * np.abs(covdet), 0.5)) * \
-#               np.exp(-0.5 * xdiff.dot(covinv).dot(xdiff.T))[0][0]
+        #        prob = 1.0 / (np.power(np.power(2 * np.pi, dim) * np.abs(covdet), 0.5)) * \
+        #               np.exp(-0.5 * xdiff.dot(covinv).dot(xdiff.T))[0][0]
 
         return prob
 
@@ -104,14 +104,14 @@ class My_GMM:
         len, dim = np.shape(self.Data)
         # gamma表示第j个观测数据属于第k个gmm的概率
         gammas = [np.zeros(self.K) for i in range(len)]
-        while np.abs(log_likelyhood - old_log_likelyhood) > 0.0001:
+        while np.abs(log_likelyhood - old_log_likelyhood) > 0.01:
             old_log_likelyhood = log_likelyhood
             # E-step
             for n in range(len):
                 # 计算后验概率
                 respons = [self.weights[k] * self.Gaussian(self.Data[n], self.means[k], self.covars[k]) for k in
                            range(self.K)]
-                respons = np.array(respons) + 1e-6  # 控制精度，防止溢出
+                respons = np.array(respons)
                 sum_respons = np.sum(respons)
                 sum_respons = 1e12 if sum_respons == np.inf else sum_respons
                 gammas[n] = respons / sum_respons
@@ -133,7 +133,7 @@ class My_GMM:
             for n in range(len):
                 tmp = [np.sum(self.weights[k] * self.Gaussian(self.Data[n], self.means[k], self.covars[k])) for k in
                        range(self.K)]
-                tmp = np.log(np.array(tmp) + 1e-6)  # 控制精度，防止溢出
+                tmp = np.log(np.array(tmp)) 
                 log_likelyhood.append(list(tmp))
             log_likelyhood = np.sum(log_likelyhood)
         for i in range(len):
@@ -173,10 +173,10 @@ def main_part1():
     K1 = 2
     gmm1 = My_GMM(train_data1, K1)
     gmm1.EM()
-#    print('-----gmm1 parameter-----')
-#    print(gmm1.weights)
-#    print(gmm1.means)
-#    print(gmm1.covars)
+    print('-----gmm1 parameter-----')
+    print(gmm1.weights)
+    print(gmm1.means)
+    print(gmm1.covars)
     # print(gmm1.posibility)
     # print(gmm1.prediction)
 
@@ -187,10 +187,10 @@ def main_part1():
     K2 = 2
     gmm2 = My_GMM(train_data2, K2)
     gmm2.EM()
-#    print('\n-----gmm2 parameter-----')
-#    print(gmm2.weights)
-#    print(gmm2.means)
-#    print(gmm2.covars)
+    #    print('\n-----gmm2 parameter-----')
+    #    print(gmm2.weights)
+    #    print(gmm2.means)
+    #    print(gmm2.covars)
     # print(gmm2.posibility)
     # print(gmm2.prediction)
 
@@ -203,8 +203,8 @@ def main_part1():
     test_data1_gmm1 = gmm1.test(test_data1)
     test_data1_gmm2 = gmm2.test(test_data1)
 
-#    print(test_data1_gmm1)
-#    print(test_data1_gmm2)
+    # print(test_data1_gmm1)
+    # print(test_data1_gmm2)
 
     pre1 = np.array([(0 if test_data1_gmm1[i] > test_data1_gmm2[i] else 1) for i in range(test_data1.shape[0])])
     print("test1正确率为：\n", accuracy_score(label1.tolist(), pre1.tolist()))
@@ -218,8 +218,8 @@ def main_part1():
     test_data2_gmm1 = gmm1.test(test_data2)
     test_data2_gmm2 = gmm2.test(test_data2)
 
-#    print(test_data2_gmm1)
-#    print(test_data2_gmm2)
+    # print(test_data2_gmm1)
+    # print(test_data2_gmm2)
 
     pre2 = np.array([(0 if test_data2_gmm1[i] > test_data2_gmm2[i] else 1) for i in range(test_data2.shape[0])])
     print("test2正确率为：\n", accuracy_score(label2.tolist(), pre2.tolist()))
@@ -254,7 +254,12 @@ def main_part2():
             gmm.EM()
             gmms.append(gmm)
 
-        # test phase
+        print("k = ", k)
+
+        print(gmms[0].weights)
+        print(gmms[0].means)
+        print(gmms[0].covars)
+
         test_data_gmms = []
 
         for i in range(10):
@@ -265,10 +270,9 @@ def main_part2():
             # print([test_data_gmms[i][j] for i in range(10)])
             pre.append(np.argmax([test_data_gmms[i][j] for i in range(10)]))
 
-#        print(pre)
-
         # print(np.array(test_lbs).squeeze())
         # print(np.array(pre))
+
         print("test正确率为：\n", accuracy_score(np.array(test_lbs).squeeze(), np.array(pre)))
 
 
