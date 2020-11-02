@@ -111,7 +111,7 @@ class My_GMM:
                 # 计算后验概率
                 respons = [self.weights[k] * self.Gaussian(self.Data[n], self.means[k], self.covars[k]) for k in
                            range(self.K)]
-                respons = np.array(respons)
+                respons = np.array(respons) +1e-6
                 sum_respons = np.sum(respons)
                 sum_respons = 1e12 if sum_respons == np.inf else sum_respons
                 gammas[n] = respons / sum_respons
@@ -133,7 +133,7 @@ class My_GMM:
             for n in range(len):
                 tmp = [np.sum(self.weights[k] * self.Gaussian(self.Data[n], self.means[k], self.covars[k])) for k in
                        range(self.K)]
-                tmp = np.log(np.array(tmp)) 
+                tmp = np.log(np.array(tmp)+1e-6) #防止溢出，加快收敛
                 log_likelyhood.append(list(tmp))
             log_likelyhood = np.sum(log_likelyhood)
         for i in range(len):
@@ -187,10 +187,10 @@ def main_part1():
     K2 = 2
     gmm2 = My_GMM(train_data2, K2)
     gmm2.EM()
-    #    print('\n-----gmm2 parameter-----')
-    #    print(gmm2.weights)
-    #    print(gmm2.means)
-    #    print(gmm2.covars)
+    print('\n-----gmm2 parameter-----')
+    print(gmm2.weights)
+    print(gmm2.means)
+    print(gmm2.covars)
     # print(gmm2.posibility)
     # print(gmm2.prediction)
 
@@ -256,9 +256,9 @@ def main_part2():
 
         print("k = ", k)
 
-        print(gmms[0].weights)
-        print(gmms[0].means)
-        print(gmms[0].covars)
+        # print(gmms[0].weights)
+        # print(gmms[0].means)
+        # print(gmms[0].covars)
 
         test_data_gmms = []
 
@@ -276,4 +276,4 @@ def main_part2():
         print("test正确率为：\n", accuracy_score(np.array(test_lbs).squeeze(), np.array(pre)))
 
 
-main_part2()
+main_part1()
