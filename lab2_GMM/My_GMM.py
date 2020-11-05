@@ -174,23 +174,24 @@ def main_part1():
     gmm1 = My_GMM(train_data1, K1)
     gmm1.EM()
     print('-----gmm1 parameter-----')
-    print(gmm1.weights)
-    print(gmm1.means)
-    print(gmm1.covars)
+    # print(gmm1.weights)
+    # print(gmm1.means)
+    # print(gmm1.covars)
     # print(gmm1.posibility)
     # print(gmm1.prediction)
 
     train_data2 = np.loadtxt('Train2.csv', dtype='object')
     train_data2 = np.array([[float(d) for d in data.split(",")] for data in train_data2])  # string转float
 
+
     # GMM模型
     K2 = 2
     gmm2 = My_GMM(train_data2, K2)
     gmm2.EM()
     print('\n-----gmm2 parameter-----')
-    print(gmm2.weights)
-    print(gmm2.means)
-    print(gmm2.covars)
+    # print(gmm2.weights)
+    # print(gmm2.means)
+    # print(gmm2.covars)
     # print(gmm2.posibility)
     # print(gmm2.prediction)
 
@@ -238,6 +239,8 @@ def main_part2():
     test_lbs = np.loadtxt('TestLabels.csv', dtype='object')
     test_lbs = np.array([[float(d) for d in data.split(",")] for data in test_lbs])  # string转float
 
+    print(test_samples.shape[0])
+
     # 数据转换
     train_data = []
     train_labels = []
@@ -276,4 +279,4 @@ def main_part2():
         print("test正确率为：\n", accuracy_score(np.array(test_lbs).squeeze(), np.array(pre)))
 
 
-main_part1()
+main_part2()
