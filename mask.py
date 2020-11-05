@@ -23,7 +23,7 @@ def mask_feat(feat, mask, s=1):
     return mask_feat+feat
 
 if __name__ == "__main__":
-    T = 8
+    T = 12
     np.set_printoptions(precision=3)
     mask_list = {
         "center": np.array([[1, 1, 1],
